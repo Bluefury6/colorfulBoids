@@ -3,11 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slime Mold Simulation</title>
+    <title>Simulation</title>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body style="margin: 0;">
 
-    <canvas id="myCanvas"></canvas>
+    <div class="site">
+        <canvas id="myCanvas"></canvas>
+        <div id="settings">
+            <br><br>
+            <input type="button" id="play" value="Play" onclick="play()">
+            <input type="button" id="reset" value="Reset" onclick="reset()">
+            <div id="running-settings">
+                <div class="settings-title">Settings</div>
+                <label for="velocity">Velocity</label>
+                <input type="range" id="velocity" min="0" max="5" value="1" step = 0.1>
+
+                <label for="range">Influence Range</label>
+                <input type="range" id="range" min="1" max="200" value="100" setp="1">
+
+                <label for="trail">Trail Intensity</label>
+                <input type="range" id="trail" min="0.75" max="1" value="0.975" step = 0.01>
+
+                <label for="mingle">Separate Partitions</label>
+                <input type="checkbox" id="mingle" checked>
+            </div>
+            <div id="danger-settings">
+                <div class="danger-settings-title">(Active on Reset)</div>
+
+                <label for="agent-num">Number of Agents</label>
+                <input type="range" id="agent-num" min="0" max="20000" value="5000" step="1">
+
+                <label for="teams">Number of Partitions</label>
+                <input type="range" id="teams" min="1" max="5" value="5" step = 1>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
