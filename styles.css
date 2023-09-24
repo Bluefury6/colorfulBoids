@@ -1,0 +1,80 @@
+body {
+    background-color: rgb(21, 18, 48);
+}
+
+.site {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+#settings {
+    color: rgb(255, 255, 255);
+    width: 80%;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
+    align-items: center;
+    border-left: 6px solid rgb(10, 9, 24);;
+}
+
+.settings-title {
+    margin: -10px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    font-size: xx-large;
+}
+
+.danger-settings-title {
+    margin: -10px;
+    margin-bottom: 25px;
+    margin-top: 25px;
+    font-size: x-large;
+}
+
+#running-settings {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 70%;
+    justify-content: center;
+}
+
+#danger-settings {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 70%;
+    justify-content: center;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: rgb(10, 9, 24);
+    border-radius: 10px;
+    height: 15px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background-color: rgb(63, 54, 120);
+    opacity: 1;
+    width: 10px;
+    height: 25px;
+    border-radius: 10px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+input[type="button"] {
+    background-color: rgb(63, 54, 120);
+    border: 6px solid rgb(10, 9, 24);
+    border-radius: 50px;
+    font-size: 40px;
+    margin-bottom: 25px;
+    padding: 15px;
+}
