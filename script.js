@@ -1,22 +1,23 @@
 settings = {
-    'agent_num': 3000,
-    'v_range': 1,
-    'grid_width': 256,
-    'max_trail': 0,
-    'range': 50,
-    'range_cutoff': 2,
-    'bounce': true,
-    'weighted_v_avg': false,
-    'weight_avg_iterations': 30,
-    'max_check': 10,
-    'trail_intensity': 0.95,
-    'teams': 1, // max teams is 5
+    'agent_num': 15000,
+    'v_range': 3,
+    'grid_width': 512,
+
+    'range': 100,
+    'range_cutoff': 0,
+    'max_check': 15,
+
+    'trail_intensity': 0.975, // recomended 0 or 0.9
+
+    'teams': 5, // max teams is 5
+    'comingle': false,
+
     'colors': [
       `rgb(0, ${255 / 1.5}, 255)`,
       `rgb(${255 / 1.5}, 0, 255)`,
       `rgb(255, 255, 0)`,
-      `rgb(55, 255, 55)`,
-      `rgb(255, 55, 55)`
+      `rgb(255, 55, 55)`,
+      `rgb(55, 255, 55)`
     ]
   }
   
@@ -50,21 +51,24 @@ settings = {
         this.vX = startVx;
         this.vY = startVy;
         this.cellSize = height / size;
-        this.xPos = randInt(size)*(width / size);
-        this.yPos = randInt(size)*(height / size);
         this.used = false;
         this.type = type;
+        this.xPos = randInt((width/settings['teams'])) + (width/settings['teams'])*(this.type);
+        this.yPos = randInt(size)*(height / size);
       }
   
       spreadSpores() {
         ctx.strokeStyle = settings['colors'][this.type];
-        //ctx.fillRect(this.xPos, this.yPos, this.cellSize, this.cellSize)
+        ctx.fillStyle = settings['colors'][this.type];
         
         ctx.beginPath();
         ctx.moveTo(this.xPos - this.vX*this.cellSize, this.yPos - this.vY*this.cellSize);
         ctx.lineTo(this.xPos, this.yPos);
         ctx.closePath();
         ctx.stroke();
+
+        // ctx.fillRect((this.cellSizeize/5)*(width / this.cellSize) + (this.type*this.cellSize / (4/3)), 0, 10, 1000);
+        // ctx.fillRect((this.cellSize/5)*(width / this.cellSize), 0, 10, 1000);
       }
   
       move() {
@@ -76,10 +80,7 @@ settings = {
         // finds total x and y velocity components
         for (let i = 0; i < agents.length; i++) {
           if (count > settings['max_check']) {
-            //console.log(this.type, agents[i].type, agents[i].type != this.type)
             break;
-          } else if (agents[i].type != this.type) {
-            continue;
           }
 
           let element = agents[i];
@@ -89,10 +90,18 @@ settings = {
             let dy = element.yPos - this.yPos;
 
             let dMagnitude = Math.sqrt(dx**2 + dy**2);
-            
-            totalX += element.vX*(settings['range'] - dMagnitude)/settings['range'];
-            totalY += element.vY*(settings['range'] - dMagnitude)/settings['range'];
-            count++;
+
+            if (element.type === this.type) {
+              totalX += element.vX*(settings['range'] - dMagnitude)/settings['range'];
+              totalY += element.vY*(settings['range'] - dMagnitude)/settings['range'];
+              count++;
+            } else {
+              totalX -= this.vX*(settings['range'] - dMagnitude)/settings['range'];
+              totalY -= this.vY*(settings['range'] - dMagnitude)/settings['range'];
+              count++;
+            }
+
+            //element.type = this.type;
           }
         }
 
@@ -118,25 +127,13 @@ settings = {
 
         }
 
-        if (settings['bounce']) {
-          if ((Math.round(this.yPos + this.vY) >= (height) - 1) || (Math.round(this.yPos + this.vY) <= 1)) {
-            this.vY *= -1;
-          }
-
-          if ((Math.round(this.xPos + this.vX) >= (width) - 1) || (Math.round(this.xPos + this.vX) <= 1)) {
+        if (!settings['comingle']) {
+          if (Math.round(this.xPos + 10*this.vX) <= (width/settings['teams'])*(this.type) || Math.round(this.xPos + 10*this.vX) >= ((width/settings['teams'])) + (width/settings['teams'])*(this.type)) {
             this.vX *= -1;
           }
         } else {
-          if (Math.round(this.xPos + this.vX) >= (width) - 1) {
-            this.vX = -1*Math.abs(this.vX);
-          } else if (Math.round(this.xPos + this.vX) <= 1) {
-            this.vX = Math.abs(this.vX);
-          }
-
-          if (Math.round(this.yPos + this.vY) >= (height) - 1) {
-            this.vY = -1*Math.abs(this.vY);
-          } else if (Math.round(this.yPos + this.vY) <= 1) {
-            this.vY = Math.abs(this.vY);
+          if ((Math.round(this.xPos + this.vX) >= (width) - 1) || (Math.round(this.xPos + this.vX) <= 1)) {
+            this.vX *= -1;
           }
         }
 
@@ -160,7 +157,10 @@ settings = {
 
     for (let i = 0; i < settings['agent_num']; i++) {
       let vx = Math.random()*settings['v_range'] - settings['v_range']/2;
-      agents.push(new Agent(vx, (2*Math.random() - 1)*Math.abs(settings['v_range']-vx), settings['grid_width'], randInt(settings['teams'])));
+      let vy = (2*Math.random() - 1)*Math.abs(settings['v_range']-vx);
+      let team = randInt(settings['teams']);
+
+      agents.push(new Agent(vx, vy, settings['grid_width'], team));
     }
   
     agents.forEach(element => {
@@ -168,11 +168,11 @@ settings = {
     });
   
     setInterval(() => {
+      reloadCells();
+      
       agents.forEach(element => {
         element.move();
       });
-      
-      reloadCells();
 
       iteration++;
     }, 50);
