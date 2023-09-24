@@ -83,6 +83,8 @@ class Agent {
       for (let i = 0; i < agents.length; i++) {
         if (count > settings['max_check']) {
           break;
+        } else if (agents[i].type != this.type) {
+          continue;
         }
 
         let element = agents[i];
@@ -96,10 +98,6 @@ class Agent {
           if (element.type === this.type) {
             totalX += element.vX*(settings['range'] - dMagnitude)/settings['range'];
             totalY += element.vY*(settings['range'] - dMagnitude)/settings['range'];
-            count++;
-          } else {
-            totalX -= this.vX*(settings['range'] - dMagnitude)/settings['range'];
-            totalY -= this.vY*(settings['range'] - dMagnitude)/settings['range'];
             count++;
           }
         }
@@ -124,17 +122,29 @@ class Agent {
         this.vY = vFY;
 
         magnitude = Math.sqrt(this.vX**2 + this.vY**2);
-
       }
 
+      // Collisions
       if (!settings['comingle']) {
-        if (Math.round(this.xPos + 10*this.vX) <= (width/settings['teams'])*(this.type) || Math.round(this.xPos + 10*this.vX) >= ((width/settings['teams'])) + (width/settings['teams'])*(this.type)) {
-          this.vX *= -1;
+        if (Math.round(this.xPos + 10*this.vX) <= (width/settings['teams'])*(this.type)) {
+          this.vX = Math.abs(Math.sqrt(this.vX**2 + this.vY**2));
+          this.vY = 0;
+        } else if (Math.round(this.xPos + 10*this.vX) >= ((width/settings['teams'])) + (width/settings['teams'])*(this.type)) {
+          this.vX = -Math.abs(Math.sqrt(this.vX**2 + this.vY**2));
+          this.vY = 0;
         }
       } else {
-        if ((Math.round(this.xPos + this.vX) >= (width) - 1) || (Math.round(this.xPos + this.vX) <= 1)) {
-          this.vX *= -1;
+        if ((Math.round(this.xPos + this.vX) >= (width) - 1)) {
+          this.vX = -Math.abs(this.vX);
+        } else if ((Math.round(this.xPos + this.vX) <= 1)) {
+          this.vX = Math.abs(this.vX);
         }
+      }
+
+      if (this.yPos + 10*this.vY < 1) {
+        this.vY = Math.abs(this.vY);
+      } else if (this.yPos + 10*this.vY > height - 1) {
+        this.vY = -Math.abs(this.vY);
       }
 
       this.xPos += this.vX*this.cellSize*settings['v_range'];
